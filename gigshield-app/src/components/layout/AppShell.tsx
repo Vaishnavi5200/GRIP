@@ -38,29 +38,30 @@ const navGroups = [
     items: [{ label: "Overview", href: "/dashboard", icon: Home }],
   },
   {
-    label: "WORKFLOW",
+    label: "INTELLIGENCE AGENT",
     items: [
+      { label: "Regulatory Agent", href: "/monitor", icon: BellRing, badge: "AI Agent" },
+      { label: "Impact Simulator", href: "/simulator", icon: Calculator, badge: "5,000 Txns" },
+      { label: "Rule Diff & Registry", href: "/rule-versions", icon: History },
       { label: "Regulatory Map", href: "/regulations", icon: MapPin },
-      { label: "Rule Engine", href: "/rule-versions", icon: History },
-      { label: "Transactions", href: "/transactions", icon: Receipt },
-      { label: "Calculations", href: "/calculations", icon: Calculator },
-      { label: "Reconciliation", href: "/reconciliation", icon: GitCompare },
-      { label: "Compliance Risk", href: "/risk", icon: ShieldAlert },
-      { label: "Reports", href: "/reports", icon: FileSpreadsheet },
     ],
   },
   {
-    label: "INTELLIGENCE",
+    label: "DETERMINISTIC OPS",
     items: [
-      { label: "Regulatory Monitor", href: "/monitor", icon: BellRing, badge: "New" },
+      { label: "Transactions", href: "/transactions", icon: Receipt },
+      { label: "Fee Calculations", href: "/calculations", icon: Calculator },
+      { label: "Reconciliation Hub", href: "/reconciliation", icon: GitCompare },
+      { label: "Compliance Risk", href: "/risk", icon: ShieldAlert },
+      { label: "Statutory Reports", href: "/reports", icon: FileSpreadsheet },
     ],
   },
   {
-    label: "SETTINGS",
+    label: "SETTINGS & AUDIT",
     items: [
       { label: "Organization & Billing", href: "/settings", icon: Building2 },
       { label: "Users & Roles", href: "/team", icon: Users },
-      { label: "Audit Trail", href: "/audit", icon: ScrollText },
+      { label: "Immutable Audit Trail", href: "/audit", icon: ScrollText },
     ],
   },
 ];
@@ -119,7 +120,7 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           <div>
             <div style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.2 }}>GigShield</div>
-            <div style={{ fontSize: 10, color: "#94a3b8", fontWeight: 500, marginTop: 2, lineHeight: 1 }}>Compliance OS for Gig Platforms</div>
+            <div style={{ fontSize: 10, color: "#4f46e5", fontWeight: 600, marginTop: 2, lineHeight: 1 }}>Regulatory Intelligence Agent</div>
           </div>
         </div>
 

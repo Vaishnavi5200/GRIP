@@ -18,7 +18,10 @@ import {
   ArrowRight,
   X,
   FileDown,
+  ShieldCheck,
 } from "lucide-react";
+import { TransactionBindingDrawer } from "@/components/shared/TransactionBindingDrawer";
+import { LegalStatus, EvidenceCitation } from "@/lib/engines/regulatory-types";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface UploadResult {
@@ -42,6 +45,21 @@ export default function TransactionsPage() {
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
+
+  // Binding Inspector State
+  const [selectedTxnBinding, setSelectedTxnBinding] = useState<{
+    transactionId: string;
+    workerId: string;
+    transactionDate: string;
+    sector: string;
+    vehicleType: string;
+    payout: number;
+    ruleVersionCode: string;
+    calculatedFee: number;
+    legalStatus: LegalStatus;
+    evidence: EvidenceCitation;
+    calculationSteps: Array<{ label: string; value: string }>;
+  } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -365,9 +383,53 @@ export default function TransactionsPage() {
                     </span>
                   </td>
                   <td style={{ padding: "10px 14px", textAlign: "right" }}>
-                    <Link href={`/transactions/${t.transactionId}`} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 10px", background: "#f1f5f9", color: "#374151", borderRadius: 6, fontSize: 11, fontWeight: 600, textDecoration: "none" }}>
-                      Explain Fee <ArrowRight style={{ width: 11, height: 11 }} />
-                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const prov = demoStore.getTransactionProvenance(t.transactionId);
+                        if (prov && prov.calculation) {
+                          setSelectedTxnBinding({
+                            transactionId: t.transactionId,
+                            workerId: t.workerId,
+                            transactionDate: t.transactionDate,
+                            sector: t.sector,
+                            vehicleType: t.vehicleType,
+                            payout: t.payout,
+                            ruleVersionCode: prov.appliedRule.versionCode,
+                            calculatedFee: prov.calculation.welfareFee,
+                            legalStatus: prov.legalStatus,
+                            evidence: prov.evidence[0] || {
+                              sourceDocumentId: "KAR-ACT-2025-72",
+                              sourceTitle: "Karnataka Platform Based Gig Workers Act, 2025",
+                              sourceType: "ACT",
+                              section: "Section 4",
+                              clause: "Sub-section (2)",
+                              quotedExcerpt: "Aggregator platform welfare fee contribution schedule.",
+                            },
+                            calculationSteps: prov.calculation.calculationDetail.steps.map((s) => ({
+                              label: s.label,
+                              value: s.display,
+                            })),
+                          });
+                        }
+                      }}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "5px 10px",
+                        background: "#f1f5f9",
+                        color: "#374151",
+                        borderRadius: 6,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        border: "1px solid #e2e8f0",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <ShieldCheck style={{ width: 12, height: 12, color: "#4f46e5" }} />
+                      <span>Inspect Provenance</span>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -513,6 +575,13 @@ export default function TransactionsPage() {
           </div>
         </div>
       )}
+
+      {/* ── Transaction Binding Provenance Drawer ── */}
+      <TransactionBindingDrawer
+        isOpen={!!selectedTxnBinding}
+        onClose={() => setSelectedTxnBinding(null)}
+        data={selectedTxnBinding}
+      />
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </AppShell>

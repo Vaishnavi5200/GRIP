@@ -20,6 +20,14 @@ import { resolveApplicableRule } from "../engines/rule-engine";
 import { reconcile, ReconciliationSummary, ReconciliationItem } from "../engines/reconciliation-engine";
 import { computeComplianceHealthScore, ComplianceHealthScore } from "../engines/risk-engine";
 import { AUDIT_ACTIONS } from "../engines/audit-types";
+import {
+  LegalStatus,
+  EvidenceCitation,
+  ProposedRuleExtraction,
+  BatchImpactSummary,
+  TransactionImpactResult,
+} from "../engines/regulatory-types";
+import { simulateBatchImpact } from "../engines/impact-engine";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Type Definitions
@@ -139,6 +147,9 @@ export interface DemoRuleVersion extends RuleVersionInput {
   versionNumber: number;
   rateType: "percentage" | "flat";
   lifecycleStatus: "draft" | "approved" | "active" | "superseded";
+  legalStatus: LegalStatus;
+  confidence: "HIGH" | "MEDIUM" | "LOW";
+  sourceEvidence: EvidenceCitation[];
   sourceNotificationNo: string | null;
   sourceDocumentDate: string | null;
   sourceDocumentUrl: string | null;
@@ -394,13 +405,28 @@ class DemoStore {
   }
 
   private initRuleVersions(): DemoRuleVersion[] {
-    // Verified notified structure:
-    // Base: 1% of applicable payout
-    // Ride-hailing: 2W = ₹0.50, 3W = ₹0.75, 4W = ₹1.00
-    // Food/Grocery: 2W = ₹0.50
-    // Logistics: 2W = ₹0.50, 3W = ₹0.75, LCV = ₹1.00, HCV = ₹1.50
-    // E-marketplace: 2W = ₹0.50, 3W = ₹0.75, LCV = ₹1.00
-    // Professional activity: ₹1.50
+    const karnatakaActEvidence: EvidenceCitation = {
+      sourceDocumentId: "KAR-ACT-2025-72",
+      sourceTitle: "Karnataka Platform Based Gig Workers (Social Security and Welfare) Act, 2025 (Act 72 of 2025)",
+      sourceType: "ACT",
+      section: "Section 4",
+      clause: "Sub-section (2) Welfare Fee Assessment",
+      quotedExcerpt:
+        "Every aggregator platform shall contribute a statutory welfare fee per transaction payout as notified by the Government.",
+      sourceUrl: "https://www.indiacode.nic.in/bitstream/123456789/22201/1/72_of_2025_%28e%29.pdf",
+    };
+
+    const karnatakaRulesEvidence: EvidenceCitation = {
+      sourceDocumentId: "KAG-2025-RULES",
+      sourceTitle: "Karnataka Platform Based Gig Workers Welfare Rules, 2025",
+      sourceType: "RULE",
+      section: "Rule 4 & Schedule I",
+      clause: "Rate & Transaction Cap Matrix",
+      quotedExcerpt:
+        "Welfare fee shall be calculated at 1.00% of driver payout subject to category-specific caps per ride/delivery transaction.",
+      sourceUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
+    };
+
     return [
       // 1. Ride-hailing 2W
       {
@@ -418,13 +444,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -449,13 +478,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -480,13 +512,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -511,13 +546,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -542,13 +580,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -573,13 +614,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -604,13 +648,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -635,13 +682,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -666,13 +716,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -697,13 +750,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -728,13 +784,16 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
         verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Notified Schedule)",
         sourceGazetteRef: "KAG-2025-NOTIF-02",
         sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
@@ -759,17 +818,20 @@ class DemoStore {
         effectiveFrom: "2026-02-16",
         effectiveTo: null,
         lifecycleStatus: "active",
-        verificationStatus: "demo",
+        legalStatus: "ACTIVE",
+        confidence: "HIGH",
+        sourceEvidence: [karnatakaActEvidence, karnatakaRulesEvidence],
+        verificationStatus: "verified",
         sourceDocumentTitle:
           "Karnataka Platform Based Gig Workers Welfare Rules, 2025 (Fallback Category)",
-        sourceGazetteRef: "KAG-2025-DEFAULT-SEC",
-        sourceNotificationNo: "LD/KBWWB/2025/CR-GEN",
+        sourceGazetteRef: "KAG-2025-NOTIF-02",
+        sourceNotificationNo: "LD/KBWWB/2025/CR-14",
         sourceDocumentDate: "2026-02-10",
-        sourceDocumentUrl: null,
+        sourceDocumentUrl: "https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule",
         verifiedAt: "2026-02-14T10:00:00Z",
         verifiedByName: "Vaishnavi Dwivedi (Compliance Manager)",
         interpretationNotes:
-          "General 1.0% with ₹1.00 cap when sector or vehicle type is non-standard.",
+          "Catch-all fallback rule (1.0% fee, ₹1.00 cap) for non-specified vehicle classifications.",
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
@@ -1218,12 +1280,26 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
       effectiveFrom: "2026-10-01",
       effectiveTo: null,
       lifecycleStatus: "approved", // Next step in state machine before activation!
+      legalStatus: "REQUIRES_REVIEW",
+      confidence: "HIGH",
+      sourceEvidence: [
+        {
+          sourceDocumentId: "LD-KBWWB-CR-2026-09",
+          sourceTitle: "Karnataka Labour Dept Draft Notification No. LD-KBWWB-CR-2026/09",
+          sourceType: "NOTIFICATION",
+          section: "Section 24 read with Section 4(2)",
+          clause: "Clauses 1, 2 & 6",
+          quotedExcerpt:
+            "For motor cabs (Four-Wheeler / 4W) engaged in passenger ride-hailing services, the welfare cess rate shall be revised from 1.0% to 1.5% of net driver payout, with maximum cap revised from ₹1.00 to ₹1.50.",
+          sourceUrl: "https://labour.karnataka.gov.in/gazette-pwfvs/LD-KBWWB-CR-2026-09",
+        },
+      ],
       verificationStatus: "proposed",
       sourceDocumentTitle: change.sourceDocumentTitle,
       sourceGazetteRef: "KAG-2026-DRAFT-09",
       sourceNotificationNo: "LD-KBWWB-CR-2026/09",
       sourceDocumentDate: "2026-09-01",
-      sourceDocumentUrl: null,
+      sourceDocumentUrl: "https://labour.karnataka.gov.in/gazette-pwfvs/LD-KBWWB-CR-2026-09",
       verifiedAt: new Date().toISOString(),
       verifiedByName: this.activeUser.name,
       interpretationNotes:
@@ -1243,6 +1319,33 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
     );
 
     return newRule;
+  }
+
+  /**
+   * Deterministic Batch Impact Simulation over 5,000 Transactions
+   */
+  public simulateRegulatoryImpact(proposedRule: ProposedRuleExtraction) {
+    return simulateBatchImpact(this.transactions, proposedRule);
+  }
+
+  /**
+   * Traceable Provenance & Rule Binding Inspector for any single Transaction
+   */
+  public getTransactionProvenance(transactionId: string) {
+    const txn = this.transactions.find((t) => t.transactionId === transactionId);
+    if (!txn) return null;
+
+    const calc = this.calculatedItems.find((c) => c.transactionId === transactionId);
+    const rule = this.ruleVersions.find((r) => r.versionCode === calc?.ruleVersionCode) || this.ruleVersions[2];
+
+    return {
+      transaction: txn,
+      calculation: calc,
+      appliedRule: rule,
+      evidence: rule.sourceEvidence,
+      legalStatus: rule.legalStatus,
+      confidence: rule.confidence,
+    };
   }
 
   // ── Audit Logging ─────────────────────────────────────────────────────────

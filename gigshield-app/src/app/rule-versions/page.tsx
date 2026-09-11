@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { demoStore, DemoRuleVersion } from "@/lib/store/demo-store";
 import { formatINR } from "@/lib/engines/calculation-engine";
@@ -13,12 +14,14 @@ import {
   ShieldCheck,
   AlertCircle,
   FileText,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 
 export default function RuleVersionsPage() {
   const [rules] = useState<DemoRuleVersion[]>(demoStore.ruleVersions);
 
-  const getLifecycleBadge = (status: string) => {
+  const getLifecycleBadge = (status: string, legalStatus?: string) => {
     switch (status) {
       case "active":
         return (
@@ -48,6 +51,36 @@ export default function RuleVersionsPage() {
     }
   };
 
+  const getLegalStatusBadge = (status?: string) => {
+    switch (status) {
+      case "UNDER_INTERIM_ORDER":
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+            Escrow Ordered
+          </span>
+        );
+      case "UNDER_CHALLENGE":
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
+            Under Challenge
+          </span>
+        );
+      case "REQUIRES_REVIEW":
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-800 border border-purple-200">
+            Review Required
+          </span>
+        );
+      case "ACTIVE":
+      default:
+        return (
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+            Active
+          </span>
+        );
+    }
+  };
+
   return (
     <AppShell>
       {/* ── Page Header ── */}
@@ -63,9 +96,13 @@ export default function RuleVersionsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 bg-slate-100 px-3 py-1 rounded-md border border-slate-200 font-mono">
-            {rules.length} Registered Rule Versions
-          </span>
+          <Link
+            href="/monitor"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Simulate Regulatory Change →</span>
+          </Link>
         </div>
       </div>
 
@@ -91,7 +128,8 @@ export default function RuleVersionsPage() {
                 <th className="py-3 px-3">Transaction Cap</th>
                 <th className="py-3 px-3">Effective Range</th>
                 <th className="py-3 px-3">Lifecycle State</th>
-                <th className="py-3 px-4">Legal Verification</th>
+                <th className="py-3 px-3">Legal Status</th>
+                <th className="py-3 px-4">Legal Provenance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -129,7 +167,9 @@ export default function RuleVersionsPage() {
                     {r.effectiveFrom} → {r.effectiveTo || "Present"}
                   </td>
 
-                  <td className="py-3 px-3">{getLifecycleBadge(r.lifecycleStatus)}</td>
+                  <td className="py-3 px-3">{getLifecycleBadge(r.lifecycleStatus, r.legalStatus)}</td>
+
+                  <td className="py-3 px-3">{getLegalStatusBadge(r.legalStatus)}</td>
 
                   <td className="py-3 px-4">
                     <RegulatoryProvenance
