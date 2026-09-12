@@ -2,7 +2,7 @@
 
 import React from "react";
 import { formatINR } from "@/lib/engines/calculation-engine";
-import { LegalStatus, EvidenceCitation } from "@/lib/engines/regulatory-types";
+import { LegalOperationalState, EvidenceCitation } from "@/lib/engines/regulatory-types";
 import {
   X,
   FileCheck,
@@ -29,11 +29,14 @@ export interface TransactionBindingDrawerProps {
     payout: number;
     ruleVersionCode: string;
     calculatedFee: number;
-    legalStatus: LegalStatus;
+    legalStatus: LegalOperationalState;
     evidence: EvidenceCitation;
     calculationSteps: Array<{ label: string; value: string }>;
     appliedRate?: string;
     appliedCap?: string;
+    bindingExplanation?: string;
+    bindingResolutionStep?: 1 | 2 | 3 | 4 | 5;
+    calculationBehaviour?: string;
   } | null;
 }
 
@@ -44,7 +47,7 @@ export function TransactionBindingDrawer({
 }: TransactionBindingDrawerProps) {
   if (!isOpen || !data) return null;
 
-  const getStatusBadge = (status: LegalStatus) => {
+  const getStatusBadge = (status: LegalOperationalState) => {
     switch (status) {
       case "ACTIVE":
         return (
@@ -146,7 +149,6 @@ export function TransactionBindingDrawer({
             </div>
           </div>
 
-          {/* Bound Rule Version */}
           <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-2xs space-y-2.5">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-[11px] uppercase tracking-wider text-slate-400">
@@ -159,9 +161,28 @@ export function TransactionBindingDrawer({
                 <span>{data.ruleVersionCode}</span>
                 <span className="text-[10px] text-slate-500 font-normal">Karnataka Act 2025</span>
               </div>
-              <p className="text-[11px] text-slate-600 mt-1">
-                Resolved by deterministic hierarchy: Exact Sector ({data.sector}) + Exact Vehicle ({data.vehicleType}).
-              </p>
+              {data.bindingExplanation && (
+                <p className="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                  {data.bindingExplanation}
+                </p>
+              )}
+              {!data.bindingExplanation && (
+                <p className="text-[11px] text-slate-600 mt-1">
+                  Resolved by deterministic hierarchy: Exact Sector ({data.sector}) + Exact Vehicle ({data.vehicleType}).
+                </p>
+              )}
+              {data.bindingResolutionStep && (
+                <div className="mt-1.5 flex items-center gap-1">
+                  <span className="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">
+                    Step {data.bindingResolutionStep} of 5 — Binding Resolved
+                  </span>
+                </div>
+              )}
+              {data.calculationBehaviour === "calculate_escrow" && (
+                <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-[10.5px] text-amber-800 font-semibold">
+                  ⚠ Escrow Directive: Fee calculated but collection directed to statutory escrow account (not state welfare fund).
+                </div>
+              )}
             </div>
           </div>
 

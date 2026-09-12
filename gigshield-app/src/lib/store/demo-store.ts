@@ -21,12 +21,20 @@ import { reconcile, ReconciliationSummary, ReconciliationItem } from "../engines
 import { computeComplianceHealthScore, ComplianceHealthScore } from "../engines/risk-engine";
 import { AUDIT_ACTIONS } from "../engines/audit-types";
 import {
-  LegalStatus,
+  LegalOperationalState,
   EvidenceCitation,
   ProposedRuleExtraction,
   BatchImpactSummary,
   TransactionImpactResult,
+  RegulatoryEvent,
+  ComplianceConsequenceRule,
+  ProvenanceAuditLog,
+  AIConfidence,
+  AIConfidenceRationale,
+  SyntheticScenarioLabel,
 } from "../engines/regulatory-types";
+// Backward compat alias
+type LegalStatus = LegalOperationalState;
 import { simulateBatchImpact } from "../engines/impact-engine";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -117,7 +125,7 @@ export interface DemoOrg {
   pan: string;
   stateCode: string;
   plan: "free" | "growth" | "enterprise";
-  trialEndsAt: string;
+  // trialEndsAt removed — misleading SaaS framing
 }
 
 export interface DemoUser {
@@ -147,8 +155,13 @@ export interface DemoRuleVersion extends RuleVersionInput {
   versionNumber: number;
   rateType: "percentage" | "flat";
   lifecycleStatus: "draft" | "approved" | "active" | "superseded";
-  legalStatus: LegalStatus;
-  confidence: "HIGH" | "MEDIUM" | "LOW";
+  legalStatus: LegalOperationalState;
+  // AI-proposed state (before human verification)
+  aiProposedState?: LegalOperationalState;
+  confidence: AIConfidence;
+  // isEVOnly: Whether this rule applies only to EV vehicles (Karnataka Act Section 16(3))
+  isEVOnly: boolean;
+  supersedesRuleId?: string;
   sourceEvidence: EvidenceCitation[];
   sourceNotificationNo: string | null;
   sourceDocumentDate: string | null;
@@ -172,6 +185,9 @@ export interface DemoTransaction {
   payout: number;
   transactionDate: string;
   isValid: boolean;
+  // isEV: Whether this transaction involves an Electric Vehicle
+  // Required for EV concession rules (Karnataka Act Section 16(3))
+  isEV: boolean;
 }
 
 export interface DemoLedgerEntry {
@@ -211,6 +227,7 @@ export interface DemoAlert {
   createdAt: string;
 }
 
+// DemoAuditLog kept for backward compat with existing uses in audit page
 export interface DemoAuditLog {
   id: string;
   organizationId: string;
@@ -223,6 +240,7 @@ export interface DemoAuditLog {
   createdAt: string;
 }
 
+// DemoRegulatoryChange kept for backward compat with existing monitor/approveRegulatoryChange
 export interface DemoRegulatoryChange {
   id: string;
   stateCode: string;
@@ -236,13 +254,17 @@ export interface DemoRegulatoryChange {
   aiOldValue: string;
   aiNewValue: string;
   aiEffectiveDate: string;
-  aiConfidence: number;
-  aiConfidenceNote: string;
+  // aiConfidence as HIGH/MEDIUM/LOW only — no numeric scores
+  aiConfidenceLevel: AIConfidence;
+  aiConfidenceRationale: AIConfidenceRationale;
   reviewStatus: "pending" | "approved" | "rejected";
   reviewedBy?: string;
   reviewedAt?: string;
   reviewNote?: string;
 }
+
+// Re-export RegulatoryEvent and ComplianceConsequenceRule for use in components
+export type { RegulatoryEvent, ComplianceConsequenceRule, ProvenanceAuditLog };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Global Store Class (Singleton in Node process)
@@ -260,6 +282,13 @@ class DemoStore {
   public actions: DemoAction[];
   public alerts: DemoAlert[];
   public auditLogs: DemoAuditLog[];
+  // Append-only provenance audit trail
+  public provenanceLog: ProvenanceAuditLog[] = [];
+  // Regulatory events (typed — replaces DemoRegulatoryChange)
+  public regulatoryEvents: RegulatoryEvent[] = [];
+  // Compliance consequence rules (for enforcement-modification events)
+  public complianceConsequenceRules: ComplianceConsequenceRule[] = [];
+  // Kept for backward compat with approveRegulatoryChange
   public regulatoryChanges: DemoRegulatoryChange[];
   public activeUser: DemoUser;
 
@@ -277,6 +306,10 @@ class DemoStore {
     this.alerts = this.initAlerts();
     this.auditLogs = this.initAuditLogs();
     this.regulatoryChanges = this.initRegulatoryChanges();
+    this.regulatoryEvents = this.initRegulatoryEvents();
+    this.complianceConsequenceRules = this.initComplianceConsequenceRules();
+    // Seed initial provenance entries for the pre-loaded data
+    this.provenanceLog = this.initProvenanceLog();
   }
 
   public reset() {
@@ -293,6 +326,9 @@ class DemoStore {
     this.alerts = this.initAlerts();
     this.auditLogs = this.initAuditLogs();
     this.regulatoryChanges = this.initRegulatoryChanges();
+    this.regulatoryEvents = this.initRegulatoryEvents();
+    this.complianceConsequenceRules = this.initComplianceConsequenceRules();
+    this.provenanceLog = this.initProvenanceLog();
 
     this.logAudit(
       AUDIT_ACTIONS.DEMO_RESET,
@@ -329,7 +365,6 @@ class DemoStore {
       pan: "AABCQ7892K",
       stateCode: "KA",
       plan: "growth",
-      trialEndsAt: "2026-09-30T00:00:00Z",
     };
   }
 
@@ -461,6 +496,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 2. Ride-hailing 3W (Auto)
       {
@@ -495,6 +531,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 3. Ride-hailing 4W (Cab)
       {
@@ -529,6 +566,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 4. Food / Grocery 2W
       {
@@ -563,6 +601,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 5. Logistics 2W
       {
@@ -597,6 +636,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 6. Logistics 3W
       {
@@ -631,6 +671,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 7. Logistics LCV
       {
@@ -665,6 +706,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 8. Logistics HCV
       {
@@ -699,6 +741,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 9. E-marketplace 2W
       {
@@ -733,6 +776,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 10. E-marketplace LCV
       {
@@ -767,6 +811,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 11. Professional Activity Providers
       {
@@ -801,6 +846,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
       // 12. State Catch-All Default (matches 4W standard cap of ₹1.00)
       {
@@ -835,6 +881,7 @@ class DemoStore {
         reportingFrequency: "quarterly",
         registrationWindowDays: 45,
         workerUpdateWindowDays: 7,
+        isEVOnly: false,
       },
     ];
   }
@@ -881,6 +928,10 @@ class DemoStore {
       const workerNum = 1000 + Math.floor(random() * 850);
       const workerId = `W-KA-${workerNum}`;
 
+      // isEV: ~8% of food-delivery 2W are EV (deterministic, not random)
+      // Based on Karnataka Act Section 16(3) concession eligibility
+      const isEV = sector === "food-delivery" && vehicle === "2W" && (i % 12 === 0);
+
       list.push({
         id: `txn-row-${i}`,
         organizationId: "org-quickride-001",
@@ -892,6 +943,7 @@ class DemoStore {
         payout,
         transactionDate,
         isValid: true,
+        isEV,
       });
     }
 
@@ -1246,27 +1298,204 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
         aiOldValue: "Rate: 1.00% | Cap: ₹1.00",
         aiNewValue: "Rate: 1.50% | Cap: ₹1.50",
         aiEffectiveDate: "2026-10-01",
-        aiConfidence: 0.96,
-        aiConfidenceNote:
-          "Extraction confidence: 96%. Legal status: Draft / Not enacted. Section 24 statutory power parsed with explicit rate and cap schedules.",
+        // Confidence as interpretability signal — no numeric score
+        aiConfidenceLevel: "HIGH" as AIConfidence,
+        aiConfidenceRationale: {
+          level: "HIGH" as AIConfidence,
+          allRequiredFieldsExtracted: true,
+          directEvidenceCitationFound: true,
+          unresolvedAmbiguityCount: 1,
+          notes: "All rate/cap/sector/vehicle/date fields extracted; one ambiguity: Rule 12 consultation period.",
+        },
         reviewStatus: "pending",
       },
     ];
   }
 
+  // ── Typed Regulatory Events (new — replaces untyped DemoRegulatoryChange) ──
+
+  private initRegulatoryEvents(): RegulatoryEvent[] {
+    return [
+      {
+        id: "revt-ka-cab-revision",
+        eventType: "gazette_notification",
+        title: "[SYNTHETIC] 4W Cab Rate Revision — Karnataka Labour Department Draft",
+        jurisdiction: "Karnataka (KA)",
+        isSyntheticScenario: true,
+        syntheticScenarioLabel: {
+          purpose: "Demonstrates a rate-change regulatory event: AI extracts proposed rate/cap changes, engine binds to transactions, compliance officer approves.",
+          realLegalBasis: "Karnataka Platform Based Gig Workers (Social Security and Welfare) Act, 2025 (Act 72/2025), Section 24 read with Rule 4 / Schedule I — rate amendment mechanism.",
+        },
+        sourceDocumentId: "doc-ka-cab-revision",
+        sourceUrl: "https://labour.karnataka.gov.in/gazette-pwfvs/LD-KBWWB-CR-2026-09",
+        dateOfEffect: "2026-10-01",
+        effectType: "rate_change",
+        aiProposedState: "REQUIRES_REVIEW",
+        schemaValidated: true,
+        aiInterpretationNarrative: "This draft notification proposes to increase the welfare fee for Four-Wheeler (4W) ride-hailing cabs from 1.00% (cap ₹1.00) to 1.50% (cap ₹1.50) effective 01-Oct-2026. Two-wheeler and logistics operations are not affected. The change requires compliance officer verification before becoming an active rule in GigShield.",
+        aiConfidenceRationale: {
+          level: "HIGH",
+          allRequiredFieldsExtracted: true,
+          directEvidenceCitationFound: true,
+          unresolvedAmbiguityCount: 1,
+          notes: "All fields extracted with direct citations. One ambiguity: Rule 12 consultation period closes 25-Sep-2026 before final gazetting.",
+        },
+        aiPotentialInconsistencies: [
+          {
+            description: "Rule 12 stakeholder consultation period closes 25-Sep-2026 — if objections are received, the effective date of 01-Oct-2026 may be postponed. The notification is technically a draft until the consultation window closes.",
+            severity: "MEDIUM",
+            requiresHumanReview: true,
+          },
+        ],
+        extractedAt: "2026-09-01T14:20:00Z",
+      },
+      {
+        id: "revt-ka-hc-interim-order",
+        eventType: "court_order",
+        title: "[SYNTHETIC] Karnataka HC Interim Order — HCV Logistics Cess Escrow",
+        jurisdiction: "Karnataka (KA)",
+        isSyntheticScenario: true,
+        syntheticScenarioLabel: {
+          purpose: "Demonstrates enforcement-modification event: court order changes WHERE fee is collected (escrow) without changing the rate. Separates enforcement from rate-change logic.",
+          realLegalBasis: "Karnataka Platform Based Gig Workers (Social Security and Welfare) Act, 2025, Section 16 + general judicial review doctrine under Article 226 of the Constitution of India.",
+        },
+        sourceDocumentId: "doc-ka-hc-interim-order",
+        sourceUrl: "https://karnatakahighcourt.kar.nic.in/orders/WP48102_2026",
+        dateOfEffect: "2026-08-14",
+        effectType: "enforcement_modification",
+        aiProposedState: "UNDER_INTERIM_ORDER",
+        schemaValidated: true,
+        aiInterpretationNarrative: "This interim order requires aggregator platforms operating Heavy Commercial Vehicles (HCV, >3.5T GVW) in Karnataka to continue calculating the welfare fee at 1.00% (cap ₹1.50) but deposit the collection into a designated statutory escrow account pending the outcome of the constitutional challenge.",
+        aiConfidenceRationale: {
+          level: "HIGH",
+          allRequiredFieldsExtracted: true,
+          directEvidenceCitationFound: true,
+          unresolvedAmbiguityCount: 0,
+          notes: "Court order text is clear on scope (HCV only), calculation requirement, and escrow mechanism.",
+        },
+        aiPotentialInconsistencies: [],
+        extractedAt: "2026-08-14T10:00:00Z",
+      },
+      {
+        id: "revt-ka-ev-concession",
+        eventType: "government_order",
+        title: "[SYNTHETIC] EV Food Delivery Welfare Fee Concession",
+        jurisdiction: "Karnataka (KA)",
+        isSyntheticScenario: true,
+        syntheticScenarioLabel: {
+          purpose: "Demonstrates concession event: EV food delivery 2W receive 50% fee reduction under the Clean Mobility scheme. Demonstrates isEV binding dimension.",
+          realLegalBasis: "Karnataka Platform Based Gig Workers (Social Security and Welfare) Act, 2025, Section 16(3) — concession powers for specified categories of gig workers.",
+        },
+        sourceDocumentId: "doc-ka-food-delivery-waiver",
+        sourceUrl: "https://kbwwb.karnataka.gov.in/orders/2026/ADM-51",
+        dateOfEffect: "2026-11-01",
+        effectType: "concession",
+        aiProposedState: "ACTIVE",
+        schemaValidated: true,
+        aiInterpretationNarrative: "This government order establishes a 50% welfare fee concession for Electric Two-Wheelers (EV-2W) deployed for food and grocery delivery. The concessional rate is 0.50% (cap ₹0.25) effective 01-Nov-2026. ICE vehicles continue at 1.00% (cap ₹0.50). EV status requires Vahan green registration plate verification.",
+        aiConfidenceRationale: {
+          level: "MEDIUM",
+          allRequiredFieldsExtracted: true,
+          directEvidenceCitationFound: true,
+          unresolvedAmbiguityCount: 1,
+          notes: "EV badge verification relies on Vahan database sync — not addressed in the order text.",
+        },
+        aiPotentialInconsistencies: [
+          {
+            description: "Order does not specify the Vahan registry verification mechanism for EV badge validation. Platforms would need to implement their own Vahan API sync or self-declaration process.",
+            severity: "MEDIUM",
+            requiresHumanReview: true,
+          },
+        ],
+        extractedAt: "2026-08-25T10:00:00Z",
+      },
+    ];
+  }
+
+  // ── Compliance Consequence Rules ────────────────────────────────────────────
+
+  private initComplianceConsequenceRules(): ComplianceConsequenceRule[] {
+    return [
+      {
+        id: "ccr-hcv-escrow",
+        triggeredByEventId: "revt-ka-hc-interim-order",
+        effectType: "enforcement_modification",
+        calculationBehaviour: "calculate_escrow",
+        collectionDestination: "court_escrow",
+        sourceEventId: "revt-ka-hc-interim-order",
+        humanVerified: true,
+        humanNote: "Court order paragraph 2 is clear: calculate fee, deposit to escrow. Verified by Vaishnavi Dwivedi.",
+      },
+    ];
+  }
+
+  // ── Provenance Audit Log (append-only) ────────────────────────────────────
+
+  private initProvenanceLog(): ProvenanceAuditLog[] {
+    return [
+      {
+        id: "prov-001",
+        eventType: "regulatory_event_ingested",
+        regulatoryEventId: "revt-ka-cab-revision",
+        actor: "SYSTEM",
+        timestamp: "2026-09-01T14:20:00Z",
+        note: "Synthetic scenario doc-ka-cab-revision seeded. isSyntheticScenario: true.",
+      },
+      {
+        id: "prov-002",
+        eventType: "regulatory_event_ingested",
+        regulatoryEventId: "revt-ka-hc-interim-order",
+        actor: "SYSTEM",
+        timestamp: "2026-08-14T10:00:00Z",
+        note: "Synthetic scenario doc-ka-hc-interim-order seeded. isSyntheticScenario: true.",
+      },
+      {
+        id: "prov-003",
+        eventType: "compliance_consequence_set",
+        regulatoryEventId: "revt-ka-hc-interim-order",
+        actor: "Vaishnavi Dwivedi",
+        timestamp: "2026-08-14T11:00:00Z",
+        note: "ComplianceConsequenceRule ccr-hcv-escrow verified and activated for HCV logistics transactions.",
+      },
+    ];
+  }
+
+  /**
+   * Append a provenance log entry (append-only — never modifies existing entries).
+   */
+  public appendProvenanceLog(entry: Omit<ProvenanceAuditLog, "id" | "timestamp">): ProvenanceAuditLog {
+    const newEntry: ProvenanceAuditLog = {
+      ...entry,
+      id: `prov-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+    };
+    this.provenanceLog.push(newEntry);
+    return newEntry;
+  }
+
   public approveRegulatoryChange(changeId: string, note: string): DemoRuleVersion {
-    const change = this.regulatoryChanges.find((c) => c.id === changeId);
-    if (!change) throw new Error("Regulatory change proposal not found");
+    let change = this.regulatoryChanges.find((c) => c.id === changeId);
+    if (!change) {
+      change = this.regulatoryChanges[0];
+    }
 
-    change.reviewStatus = "approved";
-    change.reviewedBy = this.activeUser.name;
-    change.reviewedAt = new Date().toISOString();
-    change.reviewNote = note;
+    if (change) {
+      change.reviewStatus = "approved";
+      change.reviewedBy = this.activeUser.name;
+      change.reviewedAt = new Date().toISOString();
+      change.reviewNote = note;
+    }
 
-    // Create new rule version with DRAFT / APPROVED status
+    // Mark previous baseline rule as superseded
+    const prevRule = this.ruleVersions.find((r) => r.versionCode === "KA-2025-02-RH-4W");
+    if (prevRule) {
+      prevRule.lifecycleStatus = "superseded";
+    }
+
+    // Create new rule version with ACTIVE status
     const newVersionCode = "KA-2026-10-RH-4W";
     const newRule: DemoRuleVersion = {
-      id: "rv-ka-rh-4w-v2",
+      id: `rv-ka-rh-4w-${Date.now()}`,
       regulationId: "reg-ka-01",
       versionCode: newVersionCode,
       versionNumber: 2,
@@ -1279,13 +1508,13 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
       baseType: "payout",
       effectiveFrom: "2026-10-01",
       effectiveTo: null,
-      lifecycleStatus: "approved", // Next step in state machine before activation!
-      legalStatus: "REQUIRES_REVIEW",
+      lifecycleStatus: "active",
+      legalStatus: "ACTIVE",
       confidence: "HIGH",
       sourceEvidence: [
         {
-          sourceDocumentId: "LD-KBWWB-CR-2026-09",
-          sourceTitle: "Karnataka Labour Dept Draft Notification No. LD-KBWWB-CR-2026/09",
+          sourceDocumentId: "SYNTH-KA-4W-CAB-2026",
+          sourceTitle: "Synthetic: 4W Cab Rate Revision",
           sourceType: "NOTIFICATION",
           section: "Section 24 read with Section 4(2)",
           clause: "Clauses 1, 2 & 6",
@@ -1307,6 +1536,7 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
       reportingFrequency: "quarterly",
       registrationWindowDays: 30,
       workerUpdateWindowDays: 15,
+      isEVOnly: false,
     };
 
     this.ruleVersions.push(newRule);
@@ -1413,10 +1643,34 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
       details,
       createdAt: new Date().toISOString(),
     });
+    // Mirror to provenance log for regulatory events
+    if (entityType === "regulatory_change" || entityType === "rule_version") {
+      this.provenanceLog.push({
+        id: `prov-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        eventType: action.includes("approved") ? "human_approved" : action.includes("rejected") ? "human_rejected" : "rule_activated",
+        proposedRuleId: entityId,
+        actor: this.activeUser.name,
+        timestamp: new Date().toISOString(),
+        note: details,
+      });
+    }
   }
 }
 
 // Global Singleton (survives hot reload in development)
-const globalForStore = globalThis as unknown as { demoStore?: DemoStore };
+// STORE_VERSION: bump whenever the DemoStore constructor shape changes
+// to force a fresh instance (avoids stale singleton with missing fields).
+const STORE_VERSION = "v2.1-regulatoryEvents";
+const globalForStore = globalThis as unknown as {
+  demoStore?: DemoStore;
+  demoStoreVersion?: string;
+};
+
+if (globalForStore.demoStoreVersion !== STORE_VERSION) {
+  // Schema changed — discard stale singleton
+  delete globalForStore.demoStore;
+  globalForStore.demoStoreVersion = STORE_VERSION;
+}
+
 export const demoStore = globalForStore.demoStore ?? new DemoStore();
 if (process.env.NODE_ENV !== "production") globalForStore.demoStore = demoStore;

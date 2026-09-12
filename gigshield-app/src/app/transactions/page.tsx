@@ -147,6 +147,7 @@ export default function TransactionsPage() {
           payout: r.payout,
           transactionDate: r.transaction_date || new Date().toISOString().slice(0, 10),
           isValid: true,
+          isEV: false, // CSV uploads default to non-EV (EV flag requires Vahan registry verification)
         };
         demoStore.transactions.unshift(newTxn);
         existingIds.add(r.transaction_id);
@@ -346,8 +347,8 @@ export default function TransactionsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
             <thead>
               <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                {["Transaction ID", "Worker ID", "Sector & Vehicle", "Date", "Platform Payout", "Status", ""].map((h, i) => (
-                  <th key={i} style={{ padding: "10px 14px", textAlign: i >= 4 ? "right" : "left", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8", whiteSpace: "nowrap" }}>
+                {["Transaction ID", "Worker ID", "Sector & Vehicle", "Date", "Platform Payout", "Applied Rule", "Calculated Fee", ""].map((h, i) => (
+                  <th key={i} style={{ padding: "10px 14px", textAlign: i === 4 || i === 6 ? "right" : "left", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8", whiteSpace: "nowrap" }}>
                     {h}
                   </th>
                 ))}
@@ -356,38 +357,45 @@ export default function TransactionsPage() {
             <tbody>
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: "40px 20px", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>
+                  <td colSpan={8} style={{ padding: "40px 20px", textAlign: "center", color: "#94a3b8", fontSize: 13 }}>
                     No transactions match your filters.
                   </td>
                 </tr>
-              ) : paginated.map((t) => (
-                <tr key={t.id} style={{ borderBottom: "1px solid #f1f5f9" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "")}
-                >
-                  <td style={{ padding: "10px 14px" }}>
-                    <Link href={`/transactions/${t.transactionId}`} style={{ fontFamily: "monospace", fontWeight: 700, color: "#4f46e5", textDecoration: "none", fontSize: 12 }}>
-                      {t.transactionId}
-                    </Link>
-                  </td>
-                  <td style={{ padding: "10px 14px", fontFamily: "monospace", color: "#64748b", fontSize: 11 }}>{t.workerId}</td>
-                  <td style={{ padding: "10px 14px" }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", textTransform: "capitalize" }}>{t.sector}</span>
-                    <span style={{ fontSize: 10, color: "#94a3b8", fontFamily: "monospace", marginLeft: 6, padding: "1px 5px", borderRadius: 4, background: "#f1f5f9" }}>{t.vehicleType}</span>
-                  </td>
-                  <td style={{ padding: "10px 14px", color: "#64748b", fontSize: 12, whiteSpace: "nowrap" }}>{t.transactionDate}</td>
-                  <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "monospace", fontWeight: 700, color: "#0f172a" }}>{formatINR(t.payout)}</td>
-                  <td style={{ padding: "10px 14px", textAlign: "right" }}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: "#d1fae5", color: "#065f46", border: "1px solid #a7f3d0" }}>
-                      <CheckCircle2 style={{ width: 11, height: 11 }} /> Validated
-                    </span>
-                  </td>
-                  <td style={{ padding: "10px 14px", textAlign: "right" }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const prov = demoStore.getTransactionProvenance(t.transactionId);
-                        if (prov && prov.calculation) {
+              ) : paginated.map((t) => {
+                const is4WCab = t.sector === "ride-hailing" && t.vehicleType === "4W";
+                const is2WCab = t.sector === "ride-hailing" && t.vehicleType === "2W";
+                const ruleCode = is4WCab ? "KA-2025-02-RH-4W" : is2WCab ? "KA-2025-01-RH-2W" : t.sector === "food-delivery" ? "KA-2025-03-FD-2W" : "KA-2025-04-LG-LCV";
+                const calculatedFee = is4WCab ? Math.min(t.payout * 0.01, 1.0) : is2WCab ? Math.min(t.payout * 0.01, 0.5) : t.sector === "food-delivery" ? Math.min(t.payout * 0.01, 0.5) : Math.min(t.payout * 0.015, 2.5);
+
+                return (
+                  <tr key={t.id} style={{ borderBottom: "1px solid #f1f5f9" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                  >
+                    <td style={{ padding: "10px 14px" }}>
+                      <Link href={`/transactions/${t.transactionId}`} style={{ fontFamily: "monospace", fontWeight: 700, color: "#4f46e5", textDecoration: "none", fontSize: 12 }}>
+                        {t.transactionId}
+                      </Link>
+                    </td>
+                    <td style={{ padding: "10px 14px", fontFamily: "monospace", color: "#64748b", fontSize: 11 }}>{t.workerId}</td>
+                    <td style={{ padding: "10px 14px" }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", textTransform: "capitalize" }}>{t.sector}</span>
+                      <span style={{ fontSize: 10, color: "#94a3b8", fontFamily: "monospace", marginLeft: 6, padding: "1px 5px", borderRadius: 4, background: "#f1f5f9" }}>{t.vehicleType}</span>
+                    </td>
+                    <td style={{ padding: "10px 14px", color: "#64748b", fontSize: 12, whiteSpace: "nowrap" }}>{t.transactionDate}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "monospace", fontWeight: 700, color: "#0f172a" }}>{formatINR(t.payout)}</td>
+                    <td style={{ padding: "10px 14px" }}>
+                      <span style={{ fontFamily: "monospace", fontSize: 11, fontWeight: 700, color: "#4338ca", background: "#eef2ff", padding: "2px 6px", borderRadius: 4, border: "1px solid #e0e7ff" }}>
+                        {ruleCode}
+                      </span>
+                    </td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontFamily: "monospace", fontWeight: 700, color: "#0f172a" }}>
+                      {formatINR(calculatedFee)}
+                    </td>
+                    <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
                           setSelectedTxnBinding({
                             transactionId: t.transactionId,
                             workerId: t.workerId,
@@ -395,10 +403,10 @@ export default function TransactionsPage() {
                             sector: t.sector,
                             vehicleType: t.vehicleType,
                             payout: t.payout,
-                            ruleVersionCode: prov.appliedRule.versionCode,
-                            calculatedFee: prov.calculation.welfareFee,
-                            legalStatus: prov.legalStatus,
-                            evidence: prov.evidence[0] || {
+                            ruleVersionCode: ruleCode,
+                            calculatedFee: calculatedFee,
+                            legalStatus: "ACTIVE",
+                            evidence: {
                               sourceDocumentId: "KAR-ACT-2025-72",
                               sourceTitle: "Karnataka Platform Based Gig Workers Act, 2025",
                               sourceType: "ACT",
@@ -406,33 +414,36 @@ export default function TransactionsPage() {
                               clause: "Sub-section (2)",
                               quotedExcerpt: "Aggregator platform welfare fee contribution schedule.",
                             },
-                            calculationSteps: prov.calculation.calculationDetail.steps.map((s) => ({
-                              label: s.label,
-                              value: s.display,
-                            })),
+                            calculationSteps: [
+                              { label: "Platform Payout", value: formatINR(t.payout) },
+                              { label: "Applicable Rule", value: ruleCode },
+                              { label: "Statutory Rate", value: is4WCab ? "1.00%" : is2WCab ? "1.00%" : "1.00%" },
+                              { label: "Fee Cap", value: is4WCab ? "₹1.00" : "₹0.50" },
+                              { label: "Calculated Fee", value: formatINR(calculatedFee) },
+                            ],
                           });
-                        }
-                      }}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4,
-                        padding: "5px 10px",
-                        background: "#f1f5f9",
-                        color: "#374151",
-                        borderRadius: 6,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        border: "1px solid #e2e8f0",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <ShieldCheck style={{ width: 12, height: 12, color: "#4f46e5" }} />
-                      <span>Inspect Provenance</span>
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                        }}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 4,
+                          padding: "4px 9px",
+                          background: "#f8fafc",
+                          color: "#4f46e5",
+                          borderRadius: 6,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          border: "1px solid #e0e7ff",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <ShieldCheck style={{ width: 12, height: 12, color: "#4f46e5" }} />
+                        <span>Trace ↗</span>
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

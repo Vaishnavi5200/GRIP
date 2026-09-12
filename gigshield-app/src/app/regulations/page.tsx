@@ -3,226 +3,240 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
-import { demoStore } from "@/lib/store/demo-store";
 import {
-  Globe2,
-  ShieldCheck,
   FileText,
   Clock,
-  ExternalLink,
-  Search,
   CheckCircle2,
-  AlertCircle,
-  Sparkles,
-  BookOpen,
+  AlertTriangle,
   ArrowRight,
+  ExternalLink,
+  BookOpen,
+  Filter,
 } from "lucide-react";
 
-export default function RegulationsPage() {
-  const [regulations] = useState(demoStore.regulations);
-  const [selectedState, setSelectedState] = useState(demoStore.regulations[0]);
+interface RegulatoryEventItem {
+  id: string;
+  date: string;
+  displayDate: string;
+  state: string;
+  title: string;
+  subtitle: string;
+  category: "proposed" | "verified" | "research";
+  categoryLabel: string;
+  sourceDoc: string;
+  actionUrl: string;
+  actionLabel: string;
+  isSynthetic?: boolean;
+  details: string;
+}
+
+const REGULATORY_EVENTS: RegulatoryEventItem[] = [
+  {
+    id: "evt-ka-01",
+    date: "2026-09-01",
+    displayDate: "01 Sep 2026",
+    state: "Karnataka",
+    title: "Karnataka 4W Welfare Fee Rate Revision",
+    subtitle: "Draft revision proposing fee rate adjustment for Four-Wheeler motor cabs (1.00% → 1.50%, cap ₹1.00 → ₹1.50).",
+    category: "proposed",
+    categoryLabel: "Proposed Change",
+    sourceDoc: "Draft Amendment under Karnataka Act 72 of 2025, Section 24 read with Rule 4(2)",
+    actionUrl: "/intelligence",
+    actionLabel: "Review in Intelligence Agent →",
+    isSynthetic: true,
+    details: "Staged for 01-Oct-2026 effective date. Affects 823 Karnataka 4W cab trips in platform sample.",
+  },
+  {
+    id: "evt-ka-02",
+    date: "2026-08-18",
+    displayDate: "18 Aug 2026",
+    state: "Karnataka",
+    title: "Karnataka Welfare Board Operational Clarification",
+    subtitle: "Welfare board administrative advisory regarding calculation base and driver toll exclusions.",
+    category: "verified",
+    categoryLabel: "Verified Baseline",
+    sourceDoc: "Karnataka Act 72 of 2025, Section 4 read with Schedule I",
+    actionUrl: "/rule-versions",
+    actionLabel: "View Versioned Rule →",
+    details: "Established operative baseline rule KA-2025-02-RH-4W (1.00%, cap ₹1.00).",
+  },
+  {
+    id: "evt-rj-01",
+    date: "2026-08-04",
+    displayDate: "04 Aug 2026",
+    state: "Rajasthan",
+    title: "Rajasthan Platform Based Gig Workers Act Notification",
+    subtitle: "State gazette notification regarding welfare cess framework under Rajasthan Act 18 of 2023.",
+    category: "research",
+    categoryLabel: "Research / Out of Scope",
+    sourceDoc: "Rajasthan Platform Based Gig Workers (Registration and Welfare) Act, 2023",
+    actionUrl: "/rule-versions",
+    actionLabel: "View Scope →",
+    details: "Non-Karnataka jurisdiction. Tracked for multi-state regulatory roadmap.",
+  },
+];
+
+export default function RegulatoryEventsPage() {
+  const [filterTab, setFilterTab] = useState<"needs_review" | "all">("needs_review");
+
+  const displayedEvents =
+    filterTab === "needs_review"
+      ? REGULATORY_EVENTS.filter((e) => e.category === "proposed")
+      : REGULATORY_EVENTS;
 
   return (
     <AppShell>
-      {/* ── Page Header ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Globe2 className="w-5 h-5 text-indigo-600" />
-            <span>State Regulatory Coverage & Gazette Map</span>
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Jurisdictional tracker for gig worker social security legislation across India.
-          </p>
-        </div>
+      <div className="space-y-6 max-w-4xl pb-16">
+        {/* ── Page Header ── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 mb-1">
+              Regulatory Events
+            </div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              Regulatory Timeline & Change Inbox
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Chronological feed of government gazette notifications, draft orders, and welfare board directives.
+            </p>
+          </div>
 
-        <div className="flex items-center gap-2">
           <Link
-            href="/monitor"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all"
+            href="/intelligence"
+            className="self-start sm:self-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>Launch AI Regulatory Agent →</span>
+            <span>Open Intelligence Agent →</span>
           </Link>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ── State List ── */}
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Jurisdictional States ({regulations.length})
-          </h2>
+        {/* ── Filter Tabs: Needs Review | All Events ── */}
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+          <button
+            type="button"
+            onClick={() => setFilterTab("needs_review")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              filterTab === "needs_review"
+                ? "bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <span>Needs Review</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px] font-mono">
+              1
+            </span>
+          </button>
 
-          <div className="space-y-2">
-            {regulations.map((reg) => {
-              const isSelected = selectedState.id === reg.id;
-              return (
-                <div
-                  key={reg.id}
-                  onClick={() => setSelectedState(reg)}
-                  className={`p-4 rounded-xl border text-left cursor-pointer transition-all ${
-                    isSelected
-                      ? "border-indigo-600 bg-indigo-50/50 shadow-2xs"
-                      : "border-slate-200 bg-white hover:border-slate-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-800">
-                        {reg.stateCode}
-                      </span>
-                      <h3 className="font-bold text-xs text-slate-900">{reg.shortName}</h3>
-                    </div>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        reg.status === "operational"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {reg.status === "operational" ? "Active Engine" : "Research Mode"}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">{reg.title}</p>
-                </div>
-              );
-            })}
-          </div>
+          <button
+            type="button"
+            onClick={() => setFilterTab("all")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              filterTab === "all"
+                ? "bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <span>All Events</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600 text-[10px] font-mono">
+              {REGULATORY_EVENTS.length}
+            </span>
+          </button>
         </div>
 
-        {/* ── State Detail Panel ── */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-6 shadow-2xs">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between pb-4 mb-4 border-b border-slate-100 gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-black text-sm px-2.5 py-0.5 rounded bg-indigo-600 text-white">
-                  {selectedState.stateCode}
-                </span>
-                <h2 className="text-base font-bold text-slate-900">{selectedState.title}</h2>
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                Statutory Reference:{" "}
-                <span className="font-mono text-slate-700">{selectedState.gazetteRef}</span> • Last Verified:{" "}
-                {selectedState.lastVerified}
-              </p>
-            </div>
+        {/* ── Chronological Feed ── */}
+        <div className="space-y-4">
+          {displayedEvents.map((item) => {
+            const isProposed = item.category === "proposed";
+            const isVerified = item.category === "verified";
 
-            <span
-              className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider self-start ${
-                selectedState.status === "operational"
-                  ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                  : "bg-slate-100 text-slate-700 border border-slate-300"
-              }`}
-            >
-              {selectedState.status === "operational" ? "Enacted & Active" : "Research / Draft"}
-            </span>
-          </div>
-
-          <div className="space-y-5 text-xs text-slate-700">
-            {/* Official Primary Legal Source Links */}
-            {selectedState.stateCode === "KA" && (
-              <div className="p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl space-y-2">
-                <div className="flex items-center gap-1.5 font-bold text-indigo-950 text-xs">
-                  <BookOpen className="w-4 h-4 text-indigo-600" />
-                  <span>Verified India Code Statutory Sources</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
-                  <a
-                    href="https://www.indiacode.nic.in/bitstream/123456789/22201/1/72_of_2025_%28e%29.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2.5 bg-white border border-indigo-100 hover:border-indigo-300 rounded-lg flex items-center justify-between text-slate-800 group"
-                  >
-                    <span>Karnataka Act 72 of 2025 (Official PDF)</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" />
-                  </a>
-                  <a
-                    href="https://upload.indiacode.nic.in/showfile?actid=AC_KA_71_593_00008_00008_1771495569804&filename=karnataka_platform_based_gig_workers_%28social_security_and_welfare%29_rules%2C_2025.pdf&type=rule"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2.5 bg-white border border-indigo-100 hover:border-indigo-300 rounded-lg flex items-center justify-between text-slate-800 group"
-                  >
-                    <span>Karnataka Rules, 2025 (Schedule I)</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-indigo-500 group-hover:text-indigo-700" />
-                  </a>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <span className="text-slate-400 font-semibold block uppercase text-[10px] tracking-wider mb-1">
-                Operational Scope & Notes
-              </span>
-              <p className="p-3 bg-slate-50 rounded-lg border border-slate-200 leading-relaxed text-xs">
-                {selectedState.notes}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-slate-400 font-semibold block uppercase text-[10px] tracking-wider mb-1">
-                  Applicable Sectors
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedState.applicableSectors.map((s) => (
-                    <span
-                      key={s}
-                      className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-800 font-medium capitalize text-[11px]"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-slate-400 font-semibold block uppercase text-[10px] tracking-wider mb-1">
-                  Effective Statutory Date
-                </span>
-                <span className="font-semibold text-slate-900 text-xs">
-                  {selectedState.effectiveDate || "Pending Official Notification"}
-                </span>
-              </div>
-            </div>
-
-            {selectedState.status === "operational" && (
-              <div className="mt-4 pt-4 border-t border-slate-100">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold text-slate-900 text-xs">
-                    Active Executable Rule Versions ({demoStore.ruleVersions.length} Versions)
-                  </h3>
-                  <Link
-                    href="/rule-versions"
-                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                  >
-                    <span>View Rule Registry</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-
-                <div className="space-y-1.5">
-                  {demoStore.ruleVersions.slice(0, 6).map((rv) => (
-                    <div
-                      key={rv.id}
-                      className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-indigo-700">{rv.versionCode}</span>
-                        <span className="text-slate-500 capitalize">
-                          {rv.sector || "All"} ({rv.vehicleType || "All"})
-                        </span>
-                      </div>
-                      <span className="font-mono font-semibold text-slate-900">
-                        {(parseFloat(rv.rate) * 100).toFixed(2)}% (Cap {rv.cap ? `₹${rv.cap}` : "None"})
+            return (
+              <div
+                key={item.id}
+                className={`bg-white border rounded-2xl p-5 transition-all shadow-2xs ${
+                  isProposed
+                    ? "border-indigo-200 ring-1 ring-indigo-50/50"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div className="flex items-start gap-3">
+                    {/* Date Pill / Dot */}
+                    <div className="flex items-center gap-1.5 pt-0.5 shrink-0">
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          isProposed
+                            ? "bg-amber-500 ring-4 ring-amber-50"
+                            : isVerified
+                            ? "bg-emerald-500 ring-4 ring-emerald-50"
+                            : "bg-slate-400"
+                        }`}
+                      />
+                      <span className="text-xs font-bold text-slate-800 font-mono">
+                        {item.displayDate}
                       </span>
                     </div>
-                  ))}
+
+                    <div>
+                      <div className="flex items-center flex-wrap gap-2">
+                        <span className="font-mono text-[10.5px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                          {item.state}
+                        </span>
+                        <h2 className="text-sm font-bold text-slate-900">
+                          {item.title}
+                        </h2>
+                        {item.isSynthetic && (
+                          <span className="text-[9.5px] font-extrabold px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
+                            SYNTHETIC SCENARIO
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-slate-600 mt-1">
+                        {item.subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  <span
+                    className={`text-[11px] font-bold px-2.5 py-1 rounded-full shrink-0 ${
+                      isProposed
+                        ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                        : isVerified
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-slate-100 text-slate-600 border border-slate-200"
+                    }`}
+                  >
+                    {item.categoryLabel}
+                  </span>
+                </div>
+
+                {/* Footer details & Action */}
+                <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="space-y-0.5 text-slate-500">
+                    <div>
+                      <strong className="text-slate-700 font-medium">Source:</strong>{" "}
+                      <span>{item.sourceDoc}</span>
+                    </div>
+                    <div className="text-[11px] text-slate-400">
+                      {item.details}
+                    </div>
+                  </div>
+
+                  <Link
+                    href={item.actionUrl}
+                    className={`px-3.5 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1.5 shrink-0 transition-all ${
+                      isProposed
+                        ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs"
+                        : "bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200"
+                    }`}
+                  >
+                    <span>{item.actionLabel}</span>
+                  </Link>
                 </div>
               </div>
-            )}
-          </div>
+            );
+          })}
         </div>
       </div>
     </AppShell>

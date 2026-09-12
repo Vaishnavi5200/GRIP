@@ -86,50 +86,42 @@ export default function RuleVersionsPage() {
       {/* ── Page Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 mb-1">
+            Rules & Versions
+          </div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
             <History className="w-5 h-5 text-indigo-600" />
-            <span>Immutable Rule Version Registry</span>
+            <span>Compliance Rule Version Control (VCS)</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Append-only auditable lifecycle state machine: DRAFT → APPROVED → ACTIVE → SUPERSEDED. Active rules cannot be mutated.
+            Append-only auditable rule lifecycle: DRAFT → APPROVED → ACTIVE → SUPERSEDED. Every transaction binds to a verifiable rule version.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <Link
-            href="/monitor"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all"
+            href="/intelligence"
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Simulate Regulatory Change →</span>
+            <span>Stage New Rule via Agent →</span>
           </Link>
         </div>
       </div>
 
-      {/* ── State Machine Notice ── */}
-      <div className="p-3.5 bg-slate-900 text-slate-200 rounded-xl text-xs mb-6 flex items-center justify-between shadow-2xs">
-        <div className="flex items-center gap-2">
-          <Lock className="w-4 h-4 text-emerald-400" />
-          <span>
-            <strong>Immutability Guarantee:</strong> Historical calculations are permanently linked to the exact rule version code active at execution time. Changing a rate requires creating a new version.
-          </span>
-        </div>
-      </div>
-
-      {/* ── Rule Versions Table ── */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs mb-6">
+      {/* ── Rule Versions Table (Version → Scope → Rate → Effective period → Lifecycle → Provenance) ── */}
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs mb-6">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50/90 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
-                <th className="py-3 px-4">Version Code</th>
-                <th className="py-3 px-3">Sector & Vehicle</th>
-                <th className="py-3 px-3">Statutory Rate</th>
-                <th className="py-3 px-3">Transaction Cap</th>
-                <th className="py-3 px-3">Effective Range</th>
-                <th className="py-3 px-3">Lifecycle State</th>
-                <th className="py-3 px-3">Legal Status</th>
-                <th className="py-3 px-4">Legal Provenance</th>
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+                <th className="py-3 px-4">1. Version</th>
+                <th className="py-3 px-3">2. Scope</th>
+                <th className="py-3 px-3">3. Rate & Cap</th>
+                <th className="py-3 px-3">4. Effective Period</th>
+                <th className="py-3 px-3">5. Lifecycle State</th>
+                <th className="py-3 px-3">6. Operational Status</th>
+                <th className="py-3 px-4">7. Provenance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">

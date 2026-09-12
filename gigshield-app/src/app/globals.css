@@ -1,6 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
+/* Suppress Next.js development overlay badges and issue indicators */
+nextjs-portal,
+#nextjs-dev-overlay,
+[data-nextjs-toast],
+[data-nextjs-dialog-overlay],
+div[class*="nextjs-toast"],
+div[data-nextjs-dialog] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Design Tokens
    ───────────────────────────────────────────────────────────────────────────── */
