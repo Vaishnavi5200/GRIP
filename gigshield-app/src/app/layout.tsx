@@ -3,12 +3,14 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "GigShield — Gig Worker Compliance Operations",
-    template: "%s | GigShield",
+    default: "GRIP — Gig Regulatory Intelligence Platform",
+    template: "%s | GRIP",
   },
   description:
-    "GigShield is a compliance operations layer for India's gig economy, combining versioned regulatory rules, deterministic fee calculations, transaction-level reconciliation, and AI-assisted regulatory change analysis.",
+    "GRIP is your AI-powered regulatory intelligence platform for gig-economy companies, turning complex regulatory documents into clear business decisions.",
   keywords: [
+    "GRIP",
+    "gig regulatory intelligence",
     "gig worker compliance",
     "Karnataka welfare fee",
     "Karnataka Gig Workers Act 2025 compliance",

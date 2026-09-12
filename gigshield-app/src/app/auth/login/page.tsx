@@ -51,12 +51,12 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 border border-slate-200">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-500/30 font-mono">
-            GS
+          <div className="px-3 py-1.5 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/30 font-mono tracking-wider">
+            GRIP
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">GigShield</h1>
-            <p className="text-xs text-slate-500">Compliance Operations OS for India's Gig Economy</p>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">GRIP</h1>
+            <p className="text-xs text-slate-500">Gig Regulatory Intelligence Platform</p>
           </div>
         </div>
 

@@ -442,7 +442,7 @@ export function simulateBatchImpact(
       sourceDocument: proposedRule.documentTitle,
       ruleVersion: `KA-2026-10-${proposedRule.sector === "ride-hailing" ? "RH" : "GEN"}-${proposedRule.vehicleType || "4W"}`,
       transactionsCount: transactions.length,
-      calculationEngineVersion: "GigShield Deterministic Engine v2.0 — 5-Step Precedence",
+      calculationEngineVersion: "GRIP Deterministic Engine v2.0 — 5-Step Precedence",
       humanDecisionState: "PENDING_REVIEW",
     },
   };

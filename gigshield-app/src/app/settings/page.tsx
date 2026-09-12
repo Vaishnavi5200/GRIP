@@ -236,13 +236,13 @@ export default function SettingsPage() {
           <div className="bg-white rounded-xl shadow-2xl border border-slate-200 max-w-sm w-full p-6 text-center">
             <Mail className="w-8 h-8 text-indigo-600 mx-auto mb-2" />
             <h3 className="font-bold text-slate-900 text-base mb-1">
-              GigShield Enterprise Tier
+              GRIP Enterprise Tier
             </h3>
             <p className="text-xs text-slate-500 mb-4">
               Multi-state regulatory compliance coverage, custom ERP finance connectors (SAP/Oracle), and SLA-backed statutory filings.
             </p>
             <p className="p-2.5 bg-slate-50 rounded border border-slate-200 text-xs font-mono font-semibold text-slate-800 mb-4">
-              sales@gigshield.in
+              sales@grip.in
             </p>
             <button
               type="button"

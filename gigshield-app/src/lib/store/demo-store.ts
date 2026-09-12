@@ -1332,7 +1332,7 @@ In exercise of the powers conferred by Section 24 of the Karnataka Platform Base
         effectType: "rate_change",
         aiProposedState: "REQUIRES_REVIEW",
         schemaValidated: true,
-        aiInterpretationNarrative: "This draft notification proposes to increase the welfare fee for Four-Wheeler (4W) ride-hailing cabs from 1.00% (cap ₹1.00) to 1.50% (cap ₹1.50) effective 01-Oct-2026. Two-wheeler and logistics operations are not affected. The change requires compliance officer verification before becoming an active rule in GigShield.",
+        aiInterpretationNarrative: "This draft notification proposes to increase the welfare fee for Four-Wheeler (4W) ride-hailing cabs from 1.00% (cap ₹1.00) to 1.50% (cap ₹1.50) effective 01-Oct-2026. Two-wheeler and logistics operations are not affected. The change requires compliance officer verification before becoming an active rule in GRIP.",
         aiConfidenceRationale: {
           level: "HIGH",
           allRequiredFieldsExtracted: true,

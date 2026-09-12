@@ -106,7 +106,7 @@ export default function DashboardPage() {
             What changed, and what does it mean for your business?
           </h1>
           <p style={{ fontSize: 13.5, color: "#64748b", marginTop: 5, fontWeight: 400 }}>
-            GigShield understands regulatory changes and shows you the real transaction-level impact.
+            GRIP understands regulatory changes and shows you the real transaction-level impact.
           </p>
         </div>
 

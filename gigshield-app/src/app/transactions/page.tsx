@@ -218,7 +218,7 @@ export default function TransactionsPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "gigshield_transactions_template.csv";
+    a.download = "grip_transactions_template.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -239,7 +239,7 @@ export default function TransactionsPage() {
     const csv = "data:text/csv;charset=utf-8," + [headers, ...rows].map((r) => r.join(",")).join("\n");
     const a = document.createElement("a");
     a.href = encodeURI(csv);
-    a.download = `GigShield_Transactions_${Date.now()}.csv`;
+    a.download = `GRIP_Transactions_${Date.now()}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -1,5 +1,5 @@
 /**
- * GigShield AI Regulatory Extraction API Route
+ * GRIP AI Regulatory Extraction API Route
  *
  * POST /api/extract
  *
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      console.warn("[GigShield] No Gemini API key configured. Returning fallback signal.");
+      console.warn("[GRIP] No Gemini API key configured. Returning fallback signal.");
       return NextResponse.json({ fallback: true, reason: "NO_API_KEY" });
     }
 
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 
     if (!geminiResponse.ok) {
       const errText = await geminiResponse.text();
-      console.error("[GigShield] Gemini API error:", geminiResponse.status, errText);
+      console.error("[GRIP] Gemini API error:", geminiResponse.status, errText);
       return NextResponse.json({ fallback: true, reason: "GEMINI_API_ERROR" });
     }
 
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     const rawContent = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!rawContent) {
-      console.error("[GigShield] Gemini returned empty content.");
+      console.error("[GRIP] Gemini returned empty content.");
       return NextResponse.json({ fallback: true, reason: "EMPTY_RESPONSE" });
     }
 
@@ -186,11 +186,11 @@ export async function POST(request: NextRequest) {
         try {
           parsedExtraction = JSON.parse(jsonMatch[1]);
         } catch {
-          console.error("[GigShield] Failed to parse Gemini JSON output.");
+          console.error("[GRIP] Failed to parse Gemini JSON output.");
           return NextResponse.json({ fallback: true, reason: "JSON_PARSE_ERROR" });
         }
       } else {
-        console.error("[GigShield] Failed to parse Gemini JSON output.");
+        console.error("[GRIP] Failed to parse Gemini JSON output.");
         return NextResponse.json({ fallback: true, reason: "JSON_PARSE_ERROR" });
       }
     }
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
     const validated = applyValidation(parsedExtraction);
 
     if (!validated.schemaValid) {
-      console.warn("[GigShield] Schema validation failed:", validated.schemaValidationErrors);
+      console.warn("[GRIP] Schema validation failed:", validated.schemaValidationErrors);
       // Return the extraction with errors — UI will show validation failure state
       return NextResponse.json({
         ...validated,
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(validated);
   } catch (err) {
-    console.error("[GigShield] /api/extract error:", err);
+    console.error("[GRIP] /api/extract error:", err);
     return NextResponse.json({ fallback: true, reason: "SERVER_ERROR" });
   }
 }

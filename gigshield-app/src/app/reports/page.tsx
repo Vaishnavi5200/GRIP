@@ -62,7 +62,7 @@ export default function ReportsPage() {
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      `GigShield_Karnataka_Q2_2026_Statutory_Report_${Date.now()}.csv`
+      `GRIP_Karnataka_Q2_2026_Statutory_Report_${Date.now()}.csv`
     );
     document.body.appendChild(link);
     link.click();
@@ -166,7 +166,7 @@ export default function ReportsPage() {
 
         {/* Legal Disclaimer Footnote */}
         <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-lg text-[11px] text-amber-900 mb-6 leading-relaxed">
-          <strong>Mandatory Notice:</strong> Calculations are generated under Karnataka Platform Based Gig Workers Welfare Rules, 2025 notified schedule. GigShield is an internal compliance operations system and does not directly file returns on government portals without authorized officer transmission.
+          <strong>Mandatory Notice:</strong> Calculations are generated under Karnataka Platform Based Gig Workers Welfare Rules, 2025 notified schedule. GRIP is an internal compliance operations system and does not directly file returns on government portals without authorized officer transmission.
         </div>
 
         {/* Actions */}

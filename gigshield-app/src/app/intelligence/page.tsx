@@ -311,7 +311,7 @@ export default function IntelligenceAgentPage() {
         eventType: "rule_activated",
         ruleVersionCode: newRule.versionCode,
         actor: "SYSTEM",
-        note: `Rule version [${newRule.versionCode}] is now ACTIVE in GigShield calculation engine.`,
+        note: `Rule version [${newRule.versionCode}] is now ACTIVE in GRIP calculation engine.`,
       });
       setProvenanceEntries([...demoStore.provenanceLog]);
     } catch (err: unknown) {
@@ -330,7 +330,7 @@ export default function IntelligenceAgentPage() {
       note: `Compliance Officer rejected proposed interpretation. Reason: ${approvalNote}`,
     });
     setProvenanceEntries([...demoStore.provenanceLog]);
-    setActionMessage("Regulatory rule proposal rejected. No active rules were modified in GigShield.");
+    setActionMessage("Regulatory rule proposal rejected. No active rules were modified in GRIP.");
   };
 
   // Filtered transactions for the table

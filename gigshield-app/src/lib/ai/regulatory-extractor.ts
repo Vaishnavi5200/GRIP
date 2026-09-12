@@ -15,7 +15,7 @@
  * - AI NEVER performs monetary arithmetic or transaction calculations
  * - AI PROPOSES classifications — human verifies before activation
  * - Confidence is HIGH/MEDIUM/LOW only — no numeric scores
- * - GigShield does not establish legal truth
+ * - GRIP does not establish legal truth
  */
 
 import {
@@ -207,7 +207,7 @@ function getPrecomputedExtraction(
         steps: [
           "Identify all active HCV transactions (>3.5T GVW) in Karnataka since 14-Aug-2026.",
           "Reroute fee collection to court-designated escrow sub-account.",
-          "Flag impacted transactions in GigShield with UNDER_INTERIM_ORDER status.",
+          "Flag impacted transactions in GRIP with UNDER_INTERIM_ORDER status.",
           "Obtain compliance officer verification before activating escrow routing.",
         ],
         urgency: "IMMEDIATE",
@@ -301,7 +301,7 @@ function getPrecomputedExtraction(
         title: "Implement EV classification flag and Vahan verification before 01-Nov-2026",
         steps: [
           "Mark EV-capable delivery 2W transactions with isEV=true using Vahan or self-declaration.",
-          "Configure GigShield binding to apply concessional rate for isEV=true food-delivery 2W from 01-Nov-2026.",
+          "Configure GRIP binding to apply concessional rate for isEV=true food-delivery 2W from 01-Nov-2026.",
           "Seek human clarification on Vahan sync mechanism before activating EV concession rule.",
         ],
         urgency: "BEFORE_EFFECTIVE_DATE",
@@ -410,8 +410,8 @@ function getPrecomputedExtraction(
       steps: [
         "Verify final gazette publication on or before 30-Sep-2026.",
         "Run impact simulation on all Karnataka 4W ride-hailing transactions using 1.50% (cap ₹1.50).",
-        "Review liability delta and obtain compliance officer approval in GigShield.",
-        "Activate Rule Version KA-2026-10-RH-4W in GigShield upon approval before effective date.",
+        "Review liability delta and obtain compliance officer approval in GRIP.",
+        "Activate Rule Version KA-2026-10-RH-4W in GRIP upon approval before effective date.",
       ],
       urgency: "BEFORE_EFFECTIVE_DATE",
       confidence: "HIGH",
@@ -526,7 +526,7 @@ export async function extractWithProvenance(
           } else {
             // Gemini returned invalid output — fall through to pre-computed
             console.warn(
-              "[GigShield] Live AI extraction failed schema validation:",
+              "[GRIP] Live AI extraction failed schema validation:",
               validated.schemaValidationErrors
             );
             const precomputed = getPrecomputedExtraction(docId, input);
@@ -552,7 +552,7 @@ export async function extractWithProvenance(
         };
       }
     } catch (err) {
-      console.warn("[GigShield] Live AI extraction request failed:", err);
+      console.warn("[GRIP] Live AI extraction request failed:", err);
     }
   }
 

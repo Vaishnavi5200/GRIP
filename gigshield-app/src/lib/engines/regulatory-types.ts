@@ -1,16 +1,16 @@
 /**
- * GigShield Regulatory Intelligence & Provenance Types
+ * GRIP Regulatory Intelligence & Provenance Types
  *
  * Grounded in the Karnataka Platform Based Gig Workers
  * (Social Security and Welfare) Act, 2025 (Act 72 of 2025)
  * and Karnataka Rules, 2025.
  *
  * IMPORTANT TERMINOLOGY:
- * - LegalOperationalState: GigShield's normalized prototype classification of how a rule
+ * - LegalOperationalState: GRIP's normalized prototype classification of how a rule
  *   is treated for compliance calculation purposes. AI PROPOSES; human VERIFIES.
- *   GigShield does NOT establish legal truth.
+ *   GRIP does NOT establish legal truth.
  * - LifecycleStatus: Internal product state (draft→approved→active→superseded).
- *   Controlled exclusively by human approval actions within GigShield.
+ *   Controlled exclusively by human approval actions within GRIP.
  */
 
 // ── Legal-Operational State ────────────────────────────────────────────────────

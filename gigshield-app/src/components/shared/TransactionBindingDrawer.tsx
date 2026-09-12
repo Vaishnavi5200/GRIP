@@ -113,7 +113,7 @@ export function TransactionBindingDrawer({
               “Which rule governs this transaction and why?”
             </p>
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              GigShield deterministically binds every transaction to its active regulatory rule, applies the mathematical statutory calculation, and links to verified legal evidence.
+              GRIP deterministically binds every transaction to its active regulatory rule, applies the mathematical statutory calculation, and links to verified legal evidence.
             </p>
           </div>
 
