@@ -92,9 +92,9 @@ export function AgentPipelineRail({
       {/* Header */}
       <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100">
+          <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200">
             {/* Gear / Settings Icon */}
-            <svg className="w-4 h-4 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-4 h-4 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
               <circle cx="12" cy="12" r="3"/>
             </svg>
@@ -105,13 +105,13 @@ export function AgentPipelineRail({
               <span
                 className={`w-2 h-2 rounded-full ${
                   isRunning
-                    ? "bg-indigo-600 animate-ping"
+                    ? "bg-slate-900 animate-ping"
                     : isComplete
                     ? "bg-emerald-500"
-                    : "bg-emerald-500"
+                    : "bg-slate-400"
                 }`}
               />
-              <span>
+              <span className={isComplete ? "text-emerald-700" : isRunning ? "text-slate-900" : "text-slate-500"}>
                 {isRunning
                   ? "Running analysis..."
                   : isComplete
@@ -123,7 +123,7 @@ export function AgentPipelineRail({
         </div>
 
         {isFallback && (
-          <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+          <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">
             Cached Interpretation
           </span>
         )}
@@ -146,10 +146,10 @@ export function AgentPipelineRail({
                   <span
                     className={`w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center ${
                       isDone
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-slate-900 text-white"
                         : isCurrent
-                        ? "bg-indigo-600 text-white shadow-xs"
-                        : "bg-blue-100/80 text-blue-600"
+                        ? "bg-slate-900 text-white shadow-xs"
+                        : "bg-slate-100 text-slate-500"
                     }`}
                   >
                     {stepNum}
@@ -160,18 +160,18 @@ export function AgentPipelineRail({
                       isFailed
                         ? "bg-rose-100 text-rose-700 border border-rose-300"
                         : isDone
-                        ? "bg-indigo-50 text-indigo-600 border border-indigo-200"
+                        ? "bg-slate-100 text-slate-800 border border-slate-300"
                         : isCurrent
-                        ? "bg-indigo-600 text-white shadow-xs"
-                        : "bg-blue-50/60 text-blue-600 border border-blue-100"
+                        ? "bg-slate-900 text-white shadow-xs"
+                        : "bg-slate-50 text-slate-500 border border-slate-200"
                     }`}
                   >
                     {isCurrent ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
                     ) : isDone ? (
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     ) : (
-                      <Icon className="w-4 h-4 text-blue-600" />
+                      <Icon className="w-4 h-4 text-slate-500" />
                     )}
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export function AgentPipelineRail({
                     isDone
                       ? "text-slate-900"
                       : isCurrent
-                      ? "text-indigo-600"
+                      ? "text-slate-900"
                       : "text-slate-700"
                   }`}
                 >

@@ -117,8 +117,8 @@ export default function DashboardPage() {
             alignItems: "center",
             gap: 10,
             padding: "8px 16px",
-            background: "#f5f3ff",
-            border: "1px solid #ddd6fe",
+            background: "#f8fafc",
+            border: "1px solid #e2e8f0",
             borderRadius: 12,
             flexShrink: 0,
           }}
@@ -128,17 +128,17 @@ export default function DashboardPage() {
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: "#ede9fe",
+              background: "#f1f5f9",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#6366f1",
+              color: "#475569",
             }}
           >
             <Zap style={{ width: 17, height: 17 }} />
           </div>
           <div>
-            <div style={{ fontSize: 11.5, fontWeight: 800, color: "#4f46e5" }}>Regulatory Intelligence</div>
+            <div style={{ fontSize: 11.5, fontWeight: 700, color: "#0f172a" }}>Regulatory Intelligence</div>
             <div style={{ fontSize: 10, color: "#64748b" }}>From legal text to financial impact</div>
           </div>
         </div>
@@ -162,11 +162,12 @@ export default function DashboardPage() {
               <span
                 style={{
                   fontSize: 10,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   padding: "3px 9px",
                   borderRadius: 20,
-                  background: "#fee2e2",
-                  color: "#b91c1c",
+                  background: "#f1f5f9",
+                  color: "#475569",
+                  border: "1px solid #e2e8f0",
                   letterSpacing: "0.04em",
                 }}
               >
@@ -188,14 +189,14 @@ export default function DashboardPage() {
                 alignItems: "center",
                 gap: 9,
                 padding: "8px 12px",
-                background: "#fef2f2",
-                border: "1px solid #fee2e2",
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
                 borderRadius: 8,
                 fontSize: 11,
-                color: "#b91c1c",
+                color: "#64748b",
               }}
             >
-              <Info style={{ width: 14, height: 14, flexShrink: 0 }} />
+              <Info style={{ width: 14, height: 14, flexShrink: 0, color: "#64748b" }} />
               <span>This is a synthetic scenario created for demonstration purposes. Not an official government notification.</span>
             </div>
           </div>
@@ -209,15 +210,15 @@ export default function DashboardPage() {
                   alignItems: "center",
                   gap: 5,
                   fontSize: 11,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   padding: "3px 10px",
                   borderRadius: 20,
-                  background: "#fef3c7",
-                  color: "#b45309",
-                  border: "1px solid #fde68a",
+                  background: "#f8fafc",
+                  color: "#475569",
+                  border: "1px solid #e2e8f0",
                 }}
               >
-                <Clock style={{ width: 12, height: 12 }} />
+                <Clock style={{ width: 12, height: 12, color: "#64748b" }} />
                 Pending Human Validation
               </span>
             </div>
@@ -225,7 +226,7 @@ export default function DashboardPage() {
             <div style={{ fontSize: 11, color: "#64748b", fontWeight: 500, marginBottom: 2 }}>
               Calculated Sample Liability Delta
             </div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: "#dc2626", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
               + {formatINR(sampleDelta)}
             </div>
             <div style={{ fontSize: 11, color: "#64748b", marginTop: 3, marginBottom: 10 }}>
@@ -235,7 +236,7 @@ export default function DashboardPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, color: "#334155", fontWeight: 600 }}>
               <span>Current: <strong>1.00% (cap ₹1.00)</strong></span>
               <span style={{ color: "#94a3b8" }}>→</span>
-              <span style={{ color: "#4f46e5" }}>Proposed: <strong>1.50% (cap ₹1.50)</strong></span>
+              <span style={{ color: "#0f172a" }}>Proposed: <strong>1.50% (cap ₹1.50)</strong></span>
             </div>
             <div style={{ fontSize: 10.5, color: "#64748b", marginTop: 3 }}>
               Effective from: <strong>01 Oct 2026</strong>
@@ -252,13 +253,13 @@ export default function DashboardPage() {
                 justifyContent: "center",
                 gap: 8,
                 padding: "12px 22px",
-                background: "#4f46e5",
+                background: "#0f172a",
                 color: "#ffffff",
                 borderRadius: 10,
                 fontSize: 13,
                 fontWeight: 700,
                 textDecoration: "none",
-                boxShadow: "0 2px 8px rgba(79,70,229,0.28)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                 transition: "all 0.15s",
                 width: "100%",
               }}
@@ -275,7 +276,7 @@ export default function DashboardPage() {
                 gap: 6,
                 fontSize: 11.5,
                 fontWeight: 600,
-                color: "#4f46e5",
+                color: "#475569",
                 textDecoration: "none",
                 alignSelf: "center",
               }}
@@ -291,7 +292,7 @@ export default function DashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
         {/* Metric 1: Pending Event Validation */}
         <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#fef3c7", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <Clock style={{ width: 20, height: 20 }} />
           </div>
           <div>
@@ -309,7 +310,7 @@ export default function DashboardPage() {
 
         {/* Metric 2: In-Scope Transactions */}
         <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#e0f2fe", color: "#0284c7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <ListFilter style={{ width: 20, height: 20 }} />
           </div>
           <div>
@@ -327,14 +328,14 @@ export default function DashboardPage() {
 
         {/* Metric 3: Deterministic Liability Delta */}
         <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#fee2e2", color: "#b91c1c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <BarChart3 style={{ width: 20, height: 20 }} />
           </div>
           <div>
             <div style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", color: "#64748b", letterSpacing: "0.04em" }}>
               Sample Liability Delta
             </div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: "#b91c1c", lineHeight: 1.2 }}>
+            <div style={{ fontSize: 20, fontWeight: 900, color: "#0f172a", lineHeight: 1.2 }}>
               +{formatINR(sampleDelta)}
             </div>
             <div style={{ fontSize: 10.5, color: "#94a3b8", marginTop: 1 }}>
@@ -345,7 +346,7 @@ export default function DashboardPage() {
 
         {/* Metric 4: Active Rules */}
         <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#f5f3ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <ShieldCheck style={{ width: 20, height: 20 }} />
           </div>
           <div>
@@ -369,13 +370,13 @@ export default function DashboardPage() {
           <div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <span style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>Latest Regulatory Event</span>
-              <Link href="/regulations" style={{ fontSize: 11.5, fontWeight: 600, color: "#4f46e5", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
+              <Link href="/regulations" style={{ fontSize: 11.5, fontWeight: 600, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
                 View All <ArrowRight style={{ width: 11, height: 11 }} />
               </Link>
             </div>
 
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: "#ede9fe", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <FileText style={{ width: 18, height: 18 }} />
               </div>
               <div>
@@ -383,10 +384,10 @@ export default function DashboardPage() {
                   Karnataka 4W Welfare Fee Rate Revision
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                  <span style={{ fontSize: 9.5, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: "#fee2e2", color: "#b91c1c" }}>
+                  <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0" }}>
                     SYNTHETIC SCENARIO
                   </span>
-                  <span style={{ fontSize: 9.5, fontWeight: 800, padding: "2px 6px", borderRadius: 4, background: "#e0e7ff", color: "#4338ca" }}>
+                  <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0" }}>
                     AI PROPOSED
                   </span>
                 </div>
@@ -407,7 +408,7 @@ export default function DashboardPage() {
           <div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <span style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>Active Rule (Current)</span>
-              <Link href="/rule-versions" style={{ fontSize: 11.5, fontWeight: 600, color: "#4f46e5", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
+              <Link href="/rule-versions" style={{ fontSize: 11.5, fontWeight: 600, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
                 View All <ArrowRight style={{ width: 11, height: 11 }} />
               </Link>
             </div>
@@ -416,7 +417,7 @@ export default function DashboardPage() {
               <div style={{ fontSize: 13, fontWeight: 700, color: "#0f172a" }}>
                 KA-2025-02-RH-4W
               </div>
-              <span style={{ fontSize: 9.5, fontWeight: 800, padding: "2px 8px", borderRadius: 12, background: "#dcfce7", color: "#15803d" }}>
+              <span style={{ fontSize: 9.5, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: "#f0fdf4", color: "#166534", border: "1px solid #dcfce7" }}>
                 ACTIVE
               </span>
             </div>
@@ -443,7 +444,7 @@ export default function DashboardPage() {
           <div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
               <span style={{ fontSize: 13, fontWeight: 800, color: "#0f172a" }}>Upcoming Deadlines</span>
-              <Link href="/audit" style={{ fontSize: 11.5, fontWeight: 600, color: "#4f46e5", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
+              <Link href="/audit" style={{ fontSize: 11.5, fontWeight: 600, color: "#475569", textDecoration: "none", display: "flex", alignItems: "center", gap: 2 }}>
                 View Calendar <ArrowRight style={{ width: 11, height: 11 }} />
               </Link>
             </div>
@@ -452,7 +453,7 @@ export default function DashboardPage() {
               {/* Item 1 */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 6, background: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 6, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <Calendar style={{ width: 15, height: 15 }} />
                   </div>
                   <div>
@@ -460,7 +461,7 @@ export default function DashboardPage() {
                     <div style={{ fontSize: 10.5, color: "#94a3b8" }}>30 Sep 2026</div>
                   </div>
                 </div>
-                <span style={{ fontSize: 10.5, fontWeight: 800, padding: "2px 8px", borderRadius: 12, background: "#fee2e2", color: "#b91c1c" }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0" }}>
                   19 Days
                 </span>
               </div>
@@ -468,7 +469,7 @@ export default function DashboardPage() {
               {/* Item 2 */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 6, background: "#fffbeb", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 6, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <Users2 style={{ width: 15, height: 15 }} />
                   </div>
                   <div>
@@ -476,7 +477,7 @@ export default function DashboardPage() {
                     <div style={{ fontSize: 10.5, color: "#94a3b8" }}>15 Sep 2026</div>
                   </div>
                 </div>
-                <span style={{ fontSize: 10.5, fontWeight: 800, padding: "2px 8px", borderRadius: 12, background: "#fef3c7", color: "#b45309" }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0" }}>
                   4 Days
                 </span>
               </div>
@@ -484,7 +485,7 @@ export default function DashboardPage() {
               {/* Item 3 */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 6, background: "#f5f3ff", color: "#6366f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 6, background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <FileText style={{ width: 15, height: 15 }} />
                   </div>
                   <div>
@@ -492,7 +493,7 @@ export default function DashboardPage() {
                     <div style={{ fontSize: 10.5, color: "#94a3b8" }}>01 Oct 2026</div>
                   </div>
                 </div>
-                <span style={{ fontSize: 10.5, fontWeight: 800, padding: "2px 8px", borderRadius: 12, background: "#fef3c7", color: "#b45309" }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, padding: "2px 8px", borderRadius: 12, background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0" }}>
                   20 Days
                 </span>
               </div>

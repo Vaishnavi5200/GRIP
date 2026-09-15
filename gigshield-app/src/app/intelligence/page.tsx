@@ -457,7 +457,7 @@ export default function IntelligenceAgentPage() {
                           }}
                           className={`p-2.5 rounded-xl border cursor-pointer transition-all flex items-start gap-2.5 ${
                             isSelected
-                              ? "border-indigo-400 bg-indigo-50/40 shadow-2xs"
+                              ? "border-slate-800 bg-slate-50/80 shadow-2xs"
                               : "border-slate-200 hover:border-slate-300 bg-white"
                           }`}
                         >
@@ -465,7 +465,7 @@ export default function IntelligenceAgentPage() {
                             <span
                               className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
                                 isSelected
-                                  ? "border-indigo-600 bg-indigo-600"
+                                  ? "border-slate-900 bg-slate-900"
                                   : "border-slate-300 bg-white"
                               }`}
                             >
@@ -494,7 +494,7 @@ export default function IntelligenceAgentPage() {
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <FileText className="w-4 h-4 text-indigo-600" />
+                <FileText className="w-4 h-4 text-slate-700" />
                 <h3 className="text-sm font-bold text-slate-900">Ready to run?</h3>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed mb-4">
@@ -505,7 +505,7 @@ export default function IntelligenceAgentPage() {
                 type="button"
                 onClick={handleRunAgent}
                 disabled={isAnalyzing || isPdfLoading}
-                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
                 <span>{isAnalyzing ? "Running Agent..." : "Run Agent →"}</span>
               </button>
@@ -517,8 +517,8 @@ export default function IntelligenceAgentPage() {
             </div>
 
             {/* Synthetic scenario callout box */}
-            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2">
-              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-xs flex items-start gap-2">
+              <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
               <div className="text-[11px] leading-snug">
                 This is a synthetic scenario created for demonstration purposes. Not an official government notification.
               </div>
@@ -552,7 +552,7 @@ export default function IntelligenceAgentPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-1">
-                    <FileText className="w-4 h-4 text-indigo-500" />
+                    <FileText className="w-4 h-4 text-slate-600" />
                     <span className="text-xs font-bold text-slate-800">Rule Diff</span>
                   </div>
                   <span className="text-[11px] text-slate-400">What changed?</span>
@@ -560,7 +560,7 @@ export default function IntelligenceAgentPage() {
 
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-1">
-                    <BarChart3 className="w-4 h-4 text-blue-500" />
+                    <BarChart3 className="w-4 h-4 text-slate-600" />
                     <span className="text-xs font-bold text-slate-800">Estimated Impact</span>
                   </div>
                   <span className="text-[11px] text-slate-400">Affected transactions and ₹ impact</span>
@@ -568,7 +568,7 @@ export default function IntelligenceAgentPage() {
 
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-1">
-                    <LinkIcon className="w-4 h-4 text-indigo-500" />
+                    <LinkIcon className="w-4 h-4 text-slate-600" />
                     <span className="text-xs font-bold text-slate-800">Recommended Action</span>
                   </div>
                   <span className="text-[11px] text-slate-400">Proposed rule version</span>
@@ -576,7 +576,7 @@ export default function IntelligenceAgentPage() {
 
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-1">
-                    <Quote className="w-4 h-4 text-purple-500" />
+                    <Quote className="w-4 h-4 text-slate-600" />
                     <span className="text-xs font-bold text-slate-800">Evidence & Citations</span>
                   </div>
                   <span className="text-[11px] text-slate-400">Source sections and clauses</span>
@@ -587,7 +587,7 @@ export default function IntelligenceAgentPage() {
             {/* Human Review Locked Placeholder */}
             <div className="bg-white border border-slate-200 rounded-2xl p-4.5 px-5 shadow-2xs flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center border border-slate-200">
                   <UserCheck className="w-4 h-4 stroke-[2]" />
                 </div>
                 <div>

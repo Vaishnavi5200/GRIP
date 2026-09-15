@@ -59,12 +59,12 @@ export function AppShell({ children }: AppShellProps) {
       >
         {/* Brand */}
         <div style={{ padding: "20px 20px 18px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 11 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, overflow: "hidden", border: "1.5px solid #e0e7ff", background: "#eef2ff", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, overflow: "hidden", border: "1px solid #e2e8f0", background: "#f8fafc", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Image src="/grip-logo.png" alt="GRIP" width={36} height={36} style={{ objectFit: "cover", width: "100%", height: "100%" }} priority />
           </div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.02em", lineHeight: 1.2 }}>GRIP</div>
-            <div style={{ fontSize: 11, color: "#4f46e5", fontWeight: 600, marginTop: 2, lineHeight: 1 }}>Gig Regulatory Intelligence Platform</div>
+            <div style={{ fontSize: 11, color: "#64748b", fontWeight: 500, marginTop: 2, lineHeight: 1 }}>Gig Regulatory Intelligence Platform</div>
           </div>
         </div>
 
@@ -90,8 +90,8 @@ export function AppShell({ children }: AppShellProps) {
                   textDecoration: "none",
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 500,
-                  color: isActive ? "#4f46e5" : "#475569",
-                  background: isActive ? "#f3f0ff" : "transparent",
+                  color: isActive ? "#0f172a" : "#64748b",
+                  background: isActive ? "#f1f5f9" : "transparent",
                   transition: "all 0.12s",
                 }}
               >
@@ -103,7 +103,7 @@ export function AppShell({ children }: AppShellProps) {
                       top: 4,
                       bottom: 4,
                       width: 3.5,
-                      background: "#4f46e5",
+                      background: "#0f172a",
                       borderRadius: "0 3px 3px 0",
                     }}
                   />
@@ -112,7 +112,7 @@ export function AppShell({ children }: AppShellProps) {
                   style={{
                     width: 17,
                     height: 17,
-                    color: isActive ? "#4f46e5" : "#64748b",
+                    color: isActive ? "#0f172a" : "#64748b",
                     flexShrink: 0,
                   }}
                 />
